@@ -1,0 +1,16 @@
+http:
+  middlewares:
+    auth:
+      forwardAuth:
+        address: "http://auth:3000/parse"
+        trustForwardHeader: true
+        authResponseHeadersRegex: "^X-"
+    rate-limiter:
+      forwardAuth:
+        address: "http://rpm-limiter:3000"
+        trustForwardHeader: true
+    cors:
+      headers:
+        accessControlAllowMethods: "*"
+        accessControlAllowHeaders: "*"
+        accessControlAllowOriginList: "*"

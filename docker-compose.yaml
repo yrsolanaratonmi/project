@@ -1,0 +1,72 @@
+version: '3.9'
+
+services:
+  db:
+    image: postgres
+    shm_size: 128mb
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: very-strong-password
+    ports:
+     - "5432:5432"
+    networks:
+      - diplom_network
+  redis:
+    image: redis
+    restart: always
+    networks:
+      - diplom_network
+  auth:
+    build:
+      context: ./backend/auth
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+      - gateway
+    restart: always
+    networks:
+      - diplom_network
+  todo:
+    build:
+      context: ./backend/todo
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+      - gateway
+    restart: always
+    networks:
+      - diplom_network
+  acl:
+    build:
+      context: ./backend/acl
+      dockerfile: Dockerfile
+    depends_on:
+      - redis
+      - gateway
+    restart: always
+    networks:
+      - diplom_network
+  rpm-limiter:
+    build:
+      context: ./backend/rpmLimiter
+      dockerfile: Dockerfile
+    restart: always
+    depends_on:
+      - db
+      - gateway
+      - redis
+    networks:
+      - diplom_network
+  gateway:
+    image: traefik
+    volumes:
+      - "./traefik/:/etc/traefik/"
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    networks:
+      - diplom_network
+networks:
+  diplom_network:

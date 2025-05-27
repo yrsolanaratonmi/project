@@ -1,0 +1,21 @@
+http:
+  routers:
+    acl:
+      rule: "PathPrefix(`/acl`)"
+      service: acl
+      middlewares:
+        - "cors"
+        - "auth"
+        - "acl-stripprefix"
+
+  middlewares:
+    acl-stripprefix:
+      stripPrefix:
+        prefixes:
+        - "/acl"
+
+  services:
+    acl:
+      loadBalancer:
+        servers:
+        - url: http://acl:3000/

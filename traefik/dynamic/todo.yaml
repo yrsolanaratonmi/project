@@ -1,0 +1,21 @@
+http:
+  routers:
+    todo:
+      rule: "PathPrefix(`/todo`)"
+      service: todo
+      middlewares:
+        - "cors"
+        - "auth"
+        - "todo-stripprefix"
+
+  middlewares:
+    todo-stripprefix:
+      stripPrefix:
+        prefixes:
+        - "/todo"
+
+  services:
+    todo:
+      loadBalancer:
+        servers:
+        - url: http://todo:3000/
